@@ -1,0 +1,947 @@
+<script>
+var userOptions = {
+  winChance: 1, // percantage change of getting 3 icons in a row
+	matchTwoChance: 20, // percantage change of getting 2 icons in a row
+	useDefaultSounds: "yes", // do you want to use the sound effects included in this package?
+
+  audioVolume: 35, // volume level of the audio, 100 is default, for 100%, enter any number from 0 - 100
+
+  hideTextArea: "no", // do you want to show any text? Enter "yes" or "no"
+  topTextLine: "Jackpot", // what do you want it to say in the top text line of the slot machine?
+  bottomTextLine: "Slot Machine", // what do you want it to say under the top text line (this is the big text)
+
+	verticalSpacing: 20 // the amount of space between icons vertically
+};
+</script>
+
+<style type="text/css">
+    @import url('https://fonts.googleapis.com/css?family=Hind:400,700|Montserrat:400,700');
+
+html{
+  font-family: 'Montserrat', sans-serif;
+}
+
+#holder {
+  width: 100%;
+  height: 300px;
+  position: absolute;
+  left: 0;
+  top: 350px;
+  opacity: 0;
+}
+
+#reels {
+  height: 260px;
+  position: absolute;
+}
+
+.reel {
+  background: #fff;
+  width: 180px;
+  height: 260px;
+  position: relative;
+  margin-right: 20px;
+  float: left;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0 0px rgba(252,234,187,.8);
+}
+.reel:last-child{
+  margin-right: 0;
+}
+#reels.animated .bar{
+  animation: boxGlow 1s linear infinite;
+}
+#reels.animated .reel.left {
+  animation-delay: 0s;
+}
+#reels.animated .reel.middle {
+  animation-delay: .33s;
+}
+#reels.animated .reel.right {
+  animation-delay: .66s;
+}
+
+#game {
+    width: 580px;
+    height: 260px;
+    position: absolute;
+    left: 50%;
+    margin-left: -290px;
+    z-index: 100;
+}
+
+#overlays {
+    z-index: 999;
+    height: 260px;
+    position: absolute;
+}
+
+.overlaySection {
+  position: relative;
+  width: 180px;
+  height: 260px;
+  float: left;
+  margin-right: 20px;
+}
+.overlaySection:last-child{
+  margin-right: 0;
+}
+
+.outline {
+    width: 181px;
+    height: 262px;
+    background: none;
+    z-index: 99;
+    position: absolute;
+    top: -1px;
+    border: 2px solid #111;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.outlineOutter {
+    width: 183px;
+    height: 264px;
+    background: none;
+    z-index: 90;
+    position: absolute;
+    top: -2px;
+    left: -1px;
+    border: 2px solid #777;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.shadowReel {
+    width: 180px;
+    height: 260px;
+    position: absolute;
+  overflow: hidden;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.shortShadow{
+    z-index: 2;
+    position: absolute;
+    height: 60px;
+    width: 100%;
+}
+.longShadow{
+    z-index: 1;
+    position: absolute;
+    height: 110px;
+    width: 100%;
+}
+
+.shortShadow.top {
+    border-radius: 10px 10px 0 0;
+    top: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
+}
+.longShadow.top {
+    border-radius: 10px 10px 0 0;
+    top: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+.shortShadow.bottom {
+  border-radius: 0 0 10px 10px;
+    bottom: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
+}
+.longShadow.bottom {
+  border-radius:0 0 10px 10px;
+    bottom: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+#below {
+  position: absolute;
+  width: 100%;
+  height: 260px;
+  left: 0;
+  top: 0;
+}
+
+#above {
+  position: absolute;
+  width: 100%;
+  height: 260px;
+  left: 0;
+  top: 0;
+}
+
+#winnerName {
+  position: absolute;
+  top: -120px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 42px;
+  color: #FFF;
+  padding: 20px;
+  border-top: 1px solid #00C0FF;
+  border-bottom: 1px solid #00C0FF;
+  background: linear-gradient(to top, rgba(20, 30, 48, .6), rgba(36, 59, 85, .5));
+}
+
+#amount{
+  font-weight: bold;
+  position: absolute;
+  top: -142px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 26px;
+  background: #000;
+  color: #FFF;
+  border-top: 1px solid #00C0FF;
+  border-bottom: 1px solid #00C0FF;
+}
+#amount.gold {
+  border-top: 1px solid rgb(252,234,187);
+  border-bottom: 1px solid rgb(252,234,187);
+  color: rgb(252,234,187);
+}
+
+#amount span{
+  font-size: 16px;
+  position: relative;
+  top: -6px;
+  left: -4px;
+}
+
+#message {
+  font-size: 20px;
+  text-align: center;
+  width: 500px;
+  position: absolute;
+  top: 280px;
+  color: #FFF;
+  text-shadow:  -3px -1px 3px rgba(0,0,0,.2),
+            0px 4px 3px rgba(0,0,0,.7),
+            0px 8px 10px rgba(0,0,0,0.2);
+}
+
+#winnerName span {
+  position: relative;
+}
+
+#rays {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin-left: -290px;
+  width: 580px;
+  height: 260px;
+  animation: raySpin 60s linear infinite;
+}
+
+.ray {
+  width: 340px;
+  height: 60px;
+  position: absolute;
+  top: 50%;
+  margin-top: -30px;
+  left: 50%;
+  transform-origin: left 50%;
+  background: linear-gradient(to left,  rgba(252,234,187,.2), rgba(252,234,187,1));
+  filter: blur(8px);
+
+}
+.ray:nth-child(2){
+  transform: rotate(30deg)
+}
+.ray:nth-child(3){
+  transform: rotate(60deg)
+}
+.ray:nth-child(4){
+  transform: rotate(90deg)
+}
+.ray:nth-child(5){
+  transform: rotate(120deg)
+}
+.ray:nth-child(6){
+  transform: rotate(150deg)
+}
+.ray:nth-child(7){
+  transform: rotate(180deg)
+}
+.ray:nth-child(8){
+  transform: rotate(210deg)
+}
+.ray:nth-child(9){
+  transform: rotate(240deg)
+}
+.ray:nth-child(10){
+  transform: rotate(270deg)
+}
+.ray:nth-child(11){
+  transform: rotate(300deg)
+}
+.ray:nth-child(12){
+  transform: rotate(330deg)
+}
+
+@keyframes raySpin {
+  from {transform: rotate(-360deg)}
+}
+
+@keyframes boxGlow {
+  0%, 100% {box-shadow: 0 0 0px rgba(255,255,255,.8);}
+  50% {box-shadow: 0 0 50px rgba(252,234,187,.8);}
+}
+
+.spinner {
+  margin-left: 30px;
+  margin-right: 51px;
+}
+.spinner:nth-child(2){
+  margin-right: 50px;
+}
+.spinner:last-child {
+  margin-right: 0;
+}
+
+/* RAINBOW EFFECT
+
+.reel {
+  background: #f39c12;
+  animation: rainbow 1s linear infinite;
+}
+.reel:nth-child(2){
+    animation-delay: .33s;
+}
+.reel:nth-child(3){
+    animation-delay: .66s;
+}
+
+@keyframes rainbow{
+  0% {background: #f39c12;} 
+  15% {background: #f1c40f;}
+  30% {background: #2ecc71;}
+  45% {background: #3F51B5;} 
+  75% {background: #E91E63;}
+  90% {background: #e74c3c;}
+  100% {background: #f39c12;}
+}
+*/
+</style>
+
+<div id="holder">
+	<div id="below">
+		<div id="rays">
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+			<div class="ray"></div>
+		</div>
+	</div>
+
+	<div id="app">
+		<div id="overlays">
+
+			<div class="overlaySection">
+				<div class="outline"></div>
+				<div class="outlineOutter"></div>
+				<div class="shadowReel">
+					<div class="longShadow top"></div>
+					<div class="longShadow bottom"></div>
+					<div class="shortShadow top"></div>
+					<div class="shortShadow bottom"></div>
+				</div>
+			</div>
+
+			<div class="overlaySection">
+				<div class="outline"></div>
+				<div class="outlineOutter"></div>
+				<div class="shadowReel">
+					<div class="longShadow top"></div>
+					<div class="longShadow bottom"></div>
+					<div class="shortShadow top"></div>
+					<div class="shortShadow bottom"></div>
+				</div>
+			</div>
+
+			<div class="overlaySection">
+				<div class="outline"></div>
+				<div class="outlineOutter"></div>
+				<div class="shadowRe">
+					<div class="longShadow top"></div>
+					<div class="longShadow bottom"></div>
+					<div class="shortShadow top"></div>
+					<div class="shortShadow bottom"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- GAME GOES HERE -->
+		<div id="game"></div>
+
+		<div id="reels">
+			<div class="reel"></div>
+			<div class="reel"></div>
+			<div class="reel"></div>
+		</div>
+	</div>
+
+	<div id="above">
+	    <div id="winnerName"></div>
+	    <div id="amount"></div>
+	</div>
+</div>
+
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script>
+userOptions.iconSheetUrl = "assets/icon-sheet.png";
+userOptions.cellSize = 120;
+userOptions.showFPS = false;
+
+$("#amount").html(userOptions.topTextLine)
+$("#winnerName").html(userOptions.bottomTextLine)
+
+if(userOptions.hideTextArea == "yes"){
+  $("#above").remove();
+}
+
+var audio;
+
+// generates a thing. with stuff. if you win it might look like [3, 3, 3], if you lose it might be like [1, 5, 3].
+var generateResult = (function() {
+    var getNum = function(exclude, max) {
+	    var num = Math.round(Math.random() * (max-1));
+
+        if(exclude.indexOf(num) > -1) {
+        	return getNum(exclude, max);
+        }
+
+        return num;
+    };
+
+    return function(iconCount, slotCount) {
+        var arr = [];
+        var rand = Math.round(Math.random() * 100);
+
+        if(rand < userOptions.winChance) {
+        	var num = getNum([], iconCount);
+
+        	for(var i = 0; i < slotCount; i++) {
+            	arr.push(num);
+            }
+        } else if(rand < userOptions.matchTwoChance + userOptions.winChance) {
+            var num = getNum([], iconCount);
+
+        	for(var i = 0; i < 2; i++) {
+            	arr.push(num);
+            }
+
+            for(var j = 0; j < slotCount-1; j++) {
+                arr.push(getNum(arr, iconCount));
+            }
+        } else {
+        	for(var i = 0; i < slotCount; i++) {
+                arr.push(getNum(arr, iconCount));
+            }
+        }
+
+        return arr;
+    };
+})();
+
+// Center Stuff =================
+
+$.fn.centerMe = function(div, pad) {
+  var w = ($(div).width() / 2) + pad;
+  this.css('left', $(window).width() / 2 - w);
+};
+
+function center(){
+	$('#winnerName').centerMe('#winnerName', 20);
+	$('#amount').centerMe('#amount', 8);
+	$('#message').centerMe('#message', 0);
+	$('#overlays').centerMe('#overlays', 0);
+	$('#reels').centerMe('#reels', 0);
+}
+
+$( window ).resize(function() {
+	center();
+});
+
+var target = $("#winnerName");
+    target.html(target.text().replace(/./g, "<span>$&</span>"));
+
+var animate = function() {
+
+// swaps 2 elements in an array. pretty simple.
+var arraySwap = function(array, a, b) {
+    var temp = array[a];
+    array[a] = array[b];
+    array[b] = temp;
+    return array;
+};
+
+// [1, 1, 2, 2, 3, 3] will NOT turn into [1, 1, 2, 3, 2, 3] but could turn into [1, 2, 3, 1, 2, 3]
+var shuffleArrayNoAdjecents = (function() {
+
+    var noAdjacentElements = function(arr) {
+        for(var i = 0; i < arr.length; i++) {
+            if(arr[i] === arr[i+1] || arr[i] === arr[i-1]) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+   var swap = function(arr, i, direction) {
+        var temp = arr[i];
+
+        if(direction == 0) {
+            arr[i] = arr[i-1];
+            arr[i-1] = temp;
+        } else if (direction == 1) {
+            arr[i] = arr[i+1];
+            arr[i+1] = temp;
+        } else if (direction == 2) {
+            return swap(arr, i, ~~Math.round(Math.random()));
+        }
+
+        return arr;
+    };
+
+    var shift = function(arr) {
+        for(var i = 0; i < arr.length; i++) {
+            if((arr[i] === arr[i+1] || arr[i] === arr[i-1]) && i > 0 && i < arr.length - 1) {
+                swap(arr, i, 2);
+            } else if(arr[i] === arr[i-1] && i < arr.length) {
+                swap(arr, i, 0);
+            } else if(arr[i] === arr[i+1] && i > 0) {
+                swap(arr, i, 1);
+            }
+        }
+        return arr;
+    };
+
+    return function(array) {
+
+        array = array.sort(function() {
+            return Math.random() > 0.5;
+        });
+
+        if(array.length < 2)
+            return array;
+
+        while(!noAdjacentElements(array)) {
+            array = shift(array);
+        }
+
+        return array;
+
+    };
+
+})();
+
+// A spinner that gets drawn to a canvas, that can spin to a specified destination.
+class Spinner {
+
+    constructor(options) {
+        this.options = options;
+    }
+
+    init() {
+        this.canvas = this.options.canvas;
+        this.stage = new createjs.Stage(this.canvas);
+
+        this.icons = this.options.icons;
+
+        this.verticalSpacing = this.options.verticalSpacing || 0;
+        this.cellSize = this.options.cellSize;
+        this.renderOffset = this.options.renderOffset || 0;
+
+        this.onDone = function() { console.log("done") }; // function to run when finished spinning, not set yet.
+
+        this.stage.canvas.height = this.options.spinnerHeight;
+        this.stage.canvas.width = this.cellSize;
+        this.iconOrder = this.icons.order;
+        this.iconCount = this.icons.iconCount;
+
+        this.showFPS = this.options.showFPS;
+
+        this.fpsCounter = new createjs.Text("-- FPS", "20px Arial", "#000000");
+
+        this.container = new createjs.Container();
+        //this.container.snapToPixel = false;
+        this.container.cache(0, 0, this.stage.canvas.width, this.stage.canvas.height);
+
+        this.stage.addChild(this.container);
+        if(this.showFPS === true) {
+            this.stage.addChild(this.fpsCounter);
+        }
+
+        this.renderSettings = {
+            renderPoint: 0
+        };
+
+        createjs.Ticker.addEventListener("tick", this.draw.bind(this));
+    }
+
+    draw() {
+        var imgIndex = Math.floor(-this.renderSettings.renderPoint/(this.cellSize + this.verticalSpacing));
+        var renderPoint = (this.renderSettings.renderPoint % (this.cellSize + this.verticalSpacing) - (this.cellSize + this.verticalSpacing)) - this.renderOffset;
+        var indexes = [];
+
+        for(var i = 0; i < 5; i++) {
+            var orderIndex = imgIndex + i;
+            var iconIndex = this.iconOrder[orderIndex];
+
+            indexes.push(iconIndex);
+
+            if(!this.icons.icons[iconIndex]) break; // if it doesn't exist, let's exit
+
+            var icon = this.icons.icons[iconIndex]['img'];
+
+            if(indexes.indexOf(iconIndex) > -1) { // if there's 2 of the same image on screen, we need to make a clone, because easel is gonna be like "yo i already know that child, instead of adding it, i'll just move the old one"
+                icon = icon.clone();
+            }
+
+            icon.y = renderPoint;
+
+            renderPoint += (this.cellSize + this.verticalSpacing);
+            this.container.addChild(icon);
+        }
+
+        this.fpsCounter.text = createjs.Ticker.getMeasuredFPS().toFixed(1) + " FPS";
+
+        this.container.updateCache();
+        this.stage.update();
+        this.container.removeAllChildren();
+    }
+
+    spinTo(index, time) {
+
+        createjs.Tween.get(this.renderSettings)
+            .to({ renderPoint: -(index-1) * (this.cellSize + this.verticalSpacing) }, time, createjs.Ease.linear)
+            .call(function() {
+                this.onDone();
+            }.bind(this));
+    }
+
+    moveTo(index) {
+        this.renderSettings.renderPoint = -(index-1) * (this.cellSize + this.verticalSpacing);
+    }
+
+}
+
+class SlotMachine {
+
+    constructor(options) {
+        this.fps = options.fps || 30;
+        this.showFPS = options.showFPS || false;
+
+        this.slotCount = options.slotCount || 3;
+        this.gameMount = document.getElementById(options.gameMountId || "game");
+
+        this.cellSize = options.cellSize;
+        this.verticalSpacing = options.verticalSpacing || 0;
+        this.spinnerHeight = options.spinnerHeight || 260;
+
+        this.iconSheet = options.iconSheet;
+        this.iconCount = this.iconSheet.height / this.cellSize;
+        this.isRandom = options.isRandom == true;
+
+
+        this.renderOffset = (this.cellSize*3 + this.verticalSpacing*2 - this.spinnerHeight) /2;
+
+        createjs.Ticker.setFPS(this.fps);
+    }
+
+    getSpinTime(i) {
+        return this.spinTime + (i*this.spinTimeAdd);
+    }
+
+    getIconCount(i) {
+        return this.spins + (this.spinsAdd * i);
+    }
+
+    init(options) {
+        this.from = options.from;
+        this.to = options.to;
+        this.spinTime = options.spinTime || 4000;
+        this.spinTimeAdd = options.spinTimeAdd || 1000;
+
+        this.spins = options.spins;
+        this.spinsAdd = options.spinsAdd;
+
+        this.onInitDone = options.onInitDone || function(){};
+
+        this.spinners = [];
+        for(var i = 0; i < this.slotCount; i++) {
+
+            var canvas = document.createElement("canvas");
+            canvas.className = "spinner";
+
+            this.gameMount.appendChild(canvas);
+
+            var icons = this.generateIcons({
+                index: i
+            });
+
+            this.spinners[i] = new Spinner({
+                canvas: canvas,
+                icons: icons,
+                verticalSpacing: this.verticalSpacing,
+                cellSize: this.cellSize,
+                renderOffset: this.renderOffset,
+                spinnerHeight: this.spinnerHeight,
+                showFPS: this.showFPS
+            });
+
+            this.spinners[i].init();
+        }
+
+        this.onInitDone();
+    }
+
+    spin(callback) {
+
+       var indexes = this.to;
+
+        // did we win???
+        var win = (function(indexes) {
+            for(var i = 0; i < indexes.length; i++) {
+                if(indexes[i] != indexes[i+1] && indexes[i+1] != undefined) {
+                    return false;
+                }
+            }
+
+            return true;
+        })(indexes);
+
+        // make the last one fire the on done
+        this.spinners[this.spinners.length-1].onDone = (function(win) {
+            return function() {
+                setTimeout(function() {
+                    callback(win);
+                }, 100);
+            };
+        })(win);
+
+        for(var i = 0; i < this.spinners.length; i++) {
+            this.spinners[i].spinTo(this.getIconCount(i)+1, this.getSpinTime(i)); // -1 to center it
+        }
+    }
+
+    generateIcons(options) {
+        var iconSheet = this.iconSheet; // should be an Image
+        var isRandom = this.isRandom ;
+        var index = options.index || 0;
+        var from = this.from[index];
+        var to = this.to[index];
+
+        var count = this.getIconCount(index); // how many of each icon
+        var iconCount = iconSheet.height/this.cellSize; // number of unique icons.
+        var icons = [];
+
+        var copyCount = 0;
+        while((copyCount++) * iconCount < count - iconCount + 4) {}
+
+        var order = [];
+
+        for(var i = 0; i < copyCount; i++) {
+            for(var j = 0; j < iconCount; j++) {
+                order.push(j);
+            }
+        }
+
+        order = order.slice(0, count+4);
+
+        if(isRandom === true) {
+            order = shuffleArrayNoAdjecents(order);
+        }
+
+        var fromLocation = order.indexOf(from);
+
+        if(fromLocation > -1) {
+            order = arraySwap(order, fromLocation, 2);
+        }
+
+        // if(from == order[fromLocation+1]) {
+            // order = arraySwap(order, fromLocation+1, fromLocation+2);
+        // }
+
+        var toLocation = order.lastIndexOf(to);
+
+        if(toLocation > -1) {
+            order = arraySwap(order, toLocation, order.length-2);
+        }
+
+        if(order[order.length-2] == order[order.length-3]) {
+            order = arraySwap(order, order.length-3, order.length-4);
+        }
+
+        for(var k = 0; k < iconCount; k++) {
+            var icon = new createjs.Bitmap(iconSheet);
+            icon.sourceRect = new createjs.Rectangle(0, k*this.cellSize, this.cellSize, this.cellSize);
+            icon.cache(0, 0, this.cellSize, this.cellSize);
+
+            icons.push({
+                img: icon
+            });
+        }
+
+        return {
+            order: order,
+            icons: icons,
+            iconCount: iconCount
+        };
+
+    }
+
+}
+
+	var tl = new TimelineLite;
+	var slotMachine;
+
+	var animationController = {
+
+        bringIn: function(callback) {
+    		// Bring in all elements
+    		tl.to("#holder", 0, {opacity: 1, delay:.4});
+    		tl.from("#winnerName", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
+    		tl.from("#amount", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.2");
+    		tl.from("#bits", .2, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.3");
+    		tl.staggerFrom(".reel", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+    		tl.staggerFrom(".overlaySection", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+    		tl.staggerFrom(".spinner", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+    		tl.from("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, "-=.2");
+    
+    		// Start Roll
+    		tl.to("#holder", 0, {onComplete: callback, delay: 0});
+        },
+    
+        jackpot: function(callback) {
+    		tl.to("#holder", 0, {});
+    		$("#bars").addClass("animated");
+    		$("#amount").addClass("gold");
+    		TweenMax.to("#rays", .6, { opacity: 1});
+    		TweenMax.staggerTo("#winnerName span", .4, { color: "#C5B358", repeat: -1, yoyo:true}, .2);
+    		TweenMax.to("#winnerName", .4, { borderTopColor: "#C5B358", repeat: -1, yoyo:true});
+    		TweenMax.to("#winnerName", .4, { borderBottomColor: "#C5B358", repeat: -1, yoyo:true, delay: .4});
+    		tl.to("#holder", 0, {delay: 4, onComplete: callback});
+        },
+    
+        takeOut: function(callback) {
+        	// End game
+    		tl.to("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0, delay: 4});
+    		tl.to("#rays", .6, { opacity: 0});
+    		tl.staggerTo(".spinner", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+    		tl.staggerTo(".reel", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+    		tl.staggerTo(".overlaySection", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+    		tl.to("#winnerName", .2, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
+    		tl.to("#amount", .4, {onComplete: callback, ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.1");
+    		tl.to("#bits", .4, {ease: Back.easeOut.config(2.7), scale:.2, opacity: 0}, "-=.2");
+        }
+    
+    };
+
+	var getIconSheet = function(url, callback) {
+		var iconSheet = new Image();
+		iconSheet.src = url;
+		iconSheet.onload = function() {
+			console.log("thing has been done");
+			return callback(iconSheet);
+		};
+	};
+
+	var slotMachineController = {
+		init: function(iconSheet, callback) {
+			slotMachine = new SlotMachine({
+	            fps: 30,
+	            showFPS: userOptions.showFPS,
+	            slotCount: 3,
+	            gameMount: "game",
+	            isRandom: true,
+	            iconSheet: iconSheet,
+
+	            cellSize: userOptions.cellSize,
+	            verticalSpacing: userOptions.verticalSpacing,
+	            spinnerHeight: 260
+	        });
+
+			var to = generateResult(slotMachine.iconCount, slotMachine.slotCount);
+
+	        slotMachine.init({
+	            from: [1, 2, 3],
+	            to: to,
+	            spinTime: 3000,
+	            spinTimeAdd: 1000,
+	            spins: 60,
+	            spinsAdd: 15,
+	            showFPS: userOptions.showFPS,
+	            onInitDone: callback
+	        });
+		},
+		spin: function(callback) {
+			slotMachine.spin(callback);
+		}
+	};
+
+	getIconSheet(userOptions.iconSheetUrl, function(iconSheet) {
+		console.log("icon sheet loaded");
+
+		slotMachineController.init(iconSheet, function() {
+			console.log("slot machine init'd");
+
+			animationController.bringIn(function() {
+				console.log("animations brought in");
+                audio.volume = userOptions.audioVolume*.01;
+                audio.play();
+
+				slotMachineController.spin(function(win) {
+
+
+					if(win === true) {
+						animationController.jackpot(function() {
+							animationController.takeOut();
+						});
+					} else {
+						animationController.takeOut();
+						if(userOptions.useDefaultSounds=="yes"){
+						    audio.pause();
+						}
+					}
+
+				});
+
+			});
+
+		});
+
+	});
+
+};
+
+$.when(
+   $.getScript( "https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.4/TweenMax.min.js" ),
+   $.getScript( "https://code.createjs.com/createjs-2015.11.26.min.js" ),
+
+   $.Deferred(function( deferred ){
+         $( deferred.resolve );
+    })
+).done(function(){
+    center();
+    audio = new Audio('assets/slot-machine.mp3');
+    animate();
+});
+</script>
