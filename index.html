@@ -1,430 +1,101 @@
 <script>
 var userOptions = {
-  winChance: 1, // percantage change of getting 3 icons in a row
-	matchTwoChance: 20, // percantage change of getting 2 icons in a row
-	useDefaultSounds: "yes", // do you want to use the sound effects included in this package?
+    winChance: {winChance},
+    matchTwoChance: {matchTwo},
+    
+    audioURL: "{alertSound}",
+    audioVolume: {volume},
+    useDefaultSounds: "yes",
 
-  audioVolume: 35, // volume level of the audio, 100 is default, for 100%, enter any number from 0 - 100
-
-  hideTextArea: "no", // do you want to show any text? Enter "yes" or "no"
-  topTextLine: "Jackpot", // what do you want it to say in the top text line of the slot machine?
-  bottomTextLine: "Slot Machine", // what do you want it to say under the top text line (this is the big text)
-
-	verticalSpacing: 20 // the amount of space between icons vertically
+    verticalSpacing: 20
 };
 </script>
 
-<style type="text/css">
-    @import url('https://fonts.googleapis.com/css?family=Hind:400,700|Montserrat:400,700');
-
-html{
-  font-family: 'Montserrat', sans-serif;
-}
-
-#holder {
-  width: 100%;
-  height: 300px;
-  position: absolute;
-  left: 0;
-  top: 350px;
-  opacity: 0;
-}
-
-#reels {
-  height: 260px;
-  position: absolute;
-}
-
-.reel {
-  background: #fff;
-  width: 180px;
-  height: 260px;
-  position: relative;
-  margin-right: 20px;
-  float: left;
-  overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 0 0px rgba(252,234,187,.8);
-}
-.reel:last-child{
-  margin-right: 0;
-}
-#reels.animated .bar{
-  animation: boxGlow 1s linear infinite;
-}
-#reels.animated .reel.left {
-  animation-delay: 0s;
-}
-#reels.animated .reel.middle {
-  animation-delay: .33s;
-}
-#reels.animated .reel.right {
-  animation-delay: .66s;
-}
-
-#game {
-    width: 580px;
-    height: 260px;
-    position: absolute;
-    left: 50%;
-    margin-left: -290px;
-    z-index: 100;
-}
-
-#overlays {
-    z-index: 999;
-    height: 260px;
-    position: absolute;
-}
-
-.overlaySection {
-  position: relative;
-  width: 180px;
-  height: 260px;
-  float: left;
-  margin-right: 20px;
-}
-.overlaySection:last-child{
-  margin-right: 0;
-}
-
-.outline {
-    width: 181px;
-    height: 262px;
-    background: none;
-    z-index: 99;
-    position: absolute;
-    top: -1px;
-    border: 2px solid #111;
-    box-sizing: border-box;
-    border-radius: 10px;
-}
-
-.outlineOutter {
-    width: 183px;
-    height: 264px;
-    background: none;
-    z-index: 90;
-    position: absolute;
-    top: -2px;
-    left: -1px;
-    border: 2px solid #777;
-    box-sizing: border-box;
-    border-radius: 10px;
-}
-
-.shadowReel {
-    width: 180px;
-    height: 260px;
-    position: absolute;
-  overflow: hidden;
-  border-radius: 10px;
-  box-sizing: border-box;
-}
-
-.shortShadow{
-    z-index: 2;
-    position: absolute;
-    height: 60px;
-    width: 100%;
-}
-.longShadow{
-    z-index: 1;
-    position: absolute;
-    height: 110px;
-    width: 100%;
-}
-
-.shortShadow.top {
-    border-radius: 10px 10px 0 0;
-    top: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
-}
-.longShadow.top {
-    border-radius: 10px 10px 0 0;
-    top: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
-}
-
-.shortShadow.bottom {
-  border-radius: 0 0 10px 10px;
-    bottom: 0;
-    background: linear-gradient(0deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
-}
-.longShadow.bottom {
-  border-radius:0 0 10px 10px;
-    bottom: 0;
-    background: linear-gradient(0deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
-}
-
-#below {
-  position: absolute;
-  width: 100%;
-  height: 260px;
-  left: 0;
-  top: 0;
-}
-
-#above {
-  position: absolute;
-  width: 100%;
-  height: 260px;
-  left: 0;
-  top: 0;
-}
-
-#winnerName {
-  position: absolute;
-  top: -120px;
-  font-weight: bold;
-  text-align: center;
-  font-size: 42px;
-  color: #FFF;
-  padding: 20px;
-  border-top: 1px solid #00C0FF;
-  border-bottom: 1px solid #00C0FF;
-  background: linear-gradient(to top, rgba(20, 30, 48, .6), rgba(36, 59, 85, .5));
-}
-
-#amount{
-  font-weight: bold;
-  position: absolute;
-  top: -142px;
-  padding: 4px 8px;
-  text-align: center;
-  font-size: 26px;
-  background: #000;
-  color: #FFF;
-  border-top: 1px solid #00C0FF;
-  border-bottom: 1px solid #00C0FF;
-}
-#amount.gold {
-  border-top: 1px solid rgb(252,234,187);
-  border-bottom: 1px solid rgb(252,234,187);
-  color: rgb(252,234,187);
-}
-
-#amount span{
-  font-size: 16px;
-  position: relative;
-  top: -6px;
-  left: -4px;
-}
-
-#message {
-  font-size: 20px;
-  text-align: center;
-  width: 500px;
-  position: absolute;
-  top: 280px;
-  color: #FFF;
-  text-shadow:  -3px -1px 3px rgba(0,0,0,.2),
-            0px 4px 3px rgba(0,0,0,.7),
-            0px 8px 10px rgba(0,0,0,0.2);
-}
-
-#winnerName span {
-  position: relative;
-}
-
-#rays {
-  opacity: 0;
-  position: absolute;
-  left: 50%;
-  top: 0;
-  margin-left: -290px;
-  width: 580px;
-  height: 260px;
-  animation: raySpin 60s linear infinite;
-}
-
-.ray {
-  width: 340px;
-  height: 60px;
-  position: absolute;
-  top: 50%;
-  margin-top: -30px;
-  left: 50%;
-  transform-origin: left 50%;
-  background: linear-gradient(to left,  rgba(252,234,187,.2), rgba(252,234,187,1));
-  filter: blur(8px);
-
-}
-.ray:nth-child(2){
-  transform: rotate(30deg)
-}
-.ray:nth-child(3){
-  transform: rotate(60deg)
-}
-.ray:nth-child(4){
-  transform: rotate(90deg)
-}
-.ray:nth-child(5){
-  transform: rotate(120deg)
-}
-.ray:nth-child(6){
-  transform: rotate(150deg)
-}
-.ray:nth-child(7){
-  transform: rotate(180deg)
-}
-.ray:nth-child(8){
-  transform: rotate(210deg)
-}
-.ray:nth-child(9){
-  transform: rotate(240deg)
-}
-.ray:nth-child(10){
-  transform: rotate(270deg)
-}
-.ray:nth-child(11){
-  transform: rotate(300deg)
-}
-.ray:nth-child(12){
-  transform: rotate(330deg)
-}
-
-@keyframes raySpin {
-  from {transform: rotate(-360deg)}
-}
-
-@keyframes boxGlow {
-  0%, 100% {box-shadow: 0 0 0px rgba(255,255,255,.8);}
-  50% {box-shadow: 0 0 50px rgba(252,234,187,.8);}
-}
-
-.spinner {
-  margin-left: 30px;
-  margin-right: 51px;
-}
-.spinner:nth-child(2){
-  margin-right: 50px;
-}
-.spinner:last-child {
-  margin-right: 0;
-}
-
-/* RAINBOW EFFECT
-
-.reel {
-  background: #f39c12;
-  animation: rainbow 1s linear infinite;
-}
-.reel:nth-child(2){
-    animation-delay: .33s;
-}
-.reel:nth-child(3){
-    animation-delay: .66s;
-}
-
-@keyframes rainbow{
-  0% {background: #f39c12;} 
-  15% {background: #f1c40f;}
-  30% {background: #2ecc71;}
-  45% {background: #3F51B5;} 
-  75% {background: #E91E63;}
-  90% {background: #e74c3c;}
-  100% {background: #f39c12;}
-}
-*/
-</style>
-
 <div id="holder">
-	<div id="below">
-		<div id="rays">
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-			<div class="ray"></div>
-		</div>
-	</div>
+    <div id="below">
+        <div id="rays">
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+        </div>
+    </div>
 
-	<div id="app">
-		<div id="overlays">
+    <div id="app">
+        <div id="overlays">
 
-			<div class="overlaySection">
-				<div class="outline"></div>
-				<div class="outlineOutter"></div>
-				<div class="shadowReel">
-					<div class="longShadow top"></div>
-					<div class="longShadow bottom"></div>
-					<div class="shortShadow top"></div>
-					<div class="shortShadow bottom"></div>
-				</div>
-			</div>
+            <div class="overlaySection">
+                <div class="outline"></div>
+                <div class="outlineOutter"></div>
+                <div class="shadowReel">
+                    <div class="longShadow top"></div>
+                    <div class="longShadow bottom"></div>
+                    <div class="shortShadow top"></div>
+                    <div class="shortShadow bottom"></div>
+                </div>
+            </div>
 
-			<div class="overlaySection">
-				<div class="outline"></div>
-				<div class="outlineOutter"></div>
-				<div class="shadowReel">
-					<div class="longShadow top"></div>
-					<div class="longShadow bottom"></div>
-					<div class="shortShadow top"></div>
-					<div class="shortShadow bottom"></div>
-				</div>
-			</div>
+            <div class="overlaySection">
+                <div class="outline"></div>
+                <div class="outlineOutter"></div>
+                <div class="shadowReel">
+                    <div class="longShadow top"></div>
+                    <div class="longShadow bottom"></div>
+                    <div class="shortShadow top"></div>
+                    <div class="shortShadow bottom"></div>
+                </div>
+            </div>
 
-			<div class="overlaySection">
-				<div class="outline"></div>
-				<div class="outlineOutter"></div>
-				<div class="shadowRe">
-					<div class="longShadow top"></div>
-					<div class="longShadow bottom"></div>
-					<div class="shortShadow top"></div>
-					<div class="shortShadow bottom"></div>
-				</div>
-			</div>
-		</div>
+            <div class="overlaySection">
+                <div class="outline"></div>
+                <div class="outlineOutter"></div>
+                <div class="shadowRe">
+                    <div class="longShadow top"></div>
+                    <div class="longShadow bottom"></div>
+                    <div class="shortShadow top"></div>
+                    <div class="shortShadow bottom"></div>
+                </div>
+            </div>
+        </div>
 
-		<!-- GAME GOES HERE -->
-		<div id="game"></div>
+        <!-- GAME GOES HERE -->
+        <div id="game"></div>
 
-		<div id="reels">
-			<div class="reel"></div>
-			<div class="reel"></div>
-			<div class="reel"></div>
-		</div>
-	</div>
-
-	<div id="above">
-	    <div id="winnerName"></div>
-	    <div id="amount"></div>
-	</div>
+        <div id="reels">
+            <div class="reel"></div>
+            <div class="reel"></div>
+            <div class="reel"></div>
+        </div>
+    </div>
+    <div id="above">
+        <div id="winnerName">{from}</div>
+        <div id="amount">{tag}</div>
+        <div id="message">{message}</div>
+    </div>
 </div>
 
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
 <script>
-userOptions.iconSheetUrl = "assets/icon-sheet.png";
+userOptions.iconSheetUrl = "{image}";
 userOptions.cellSize = 120;
 userOptions.showFPS = false;
-
-$("#amount").html(userOptions.topTextLine)
-$("#winnerName").html(userOptions.bottomTextLine)
-
-if(userOptions.hideTextArea == "yes"){
-  $("#above").remove();
-}
 
 var audio;
 
 // generates a thing. with stuff. if you win it might look like [3, 3, 3], if you lose it might be like [1, 5, 3].
 var generateResult = (function() {
     var getNum = function(exclude, max) {
-	    var num = Math.round(Math.random() * (max-1));
+        var num = Math.round(Math.random() * (max-1));
 
         if(exclude.indexOf(num) > -1) {
-        	return getNum(exclude, max);
+            return getNum(exclude, max);
         }
 
         return num;
@@ -435,23 +106,23 @@ var generateResult = (function() {
         var rand = Math.round(Math.random() * 100);
 
         if(rand < userOptions.winChance) {
-        	var num = getNum([], iconCount);
+            var num = getNum([], iconCount);
 
-        	for(var i = 0; i < slotCount; i++) {
-            	arr.push(num);
+            for(var i = 0; i < slotCount; i++) {
+                arr.push(num);
             }
         } else if(rand < userOptions.matchTwoChance + userOptions.winChance) {
             var num = getNum([], iconCount);
 
-        	for(var i = 0; i < 2; i++) {
-            	arr.push(num);
+            for(var i = 0; i < 2; i++) {
+                arr.push(num);
             }
 
             for(var j = 0; j < slotCount-1; j++) {
                 arr.push(getNum(arr, iconCount));
             }
         } else {
-        	for(var i = 0; i < slotCount; i++) {
+            for(var i = 0; i < slotCount; i++) {
                 arr.push(getNum(arr, iconCount));
             }
         }
@@ -468,15 +139,15 @@ $.fn.centerMe = function(div, pad) {
 };
 
 function center(){
-	$('#winnerName').centerMe('#winnerName', 20);
-	$('#amount').centerMe('#amount', 8);
-	$('#message').centerMe('#message', 0);
-	$('#overlays').centerMe('#overlays', 0);
-	$('#reels').centerMe('#reels', 0);
+    $('#winnerName').centerMe('#winnerName', 20);
+    $('#amount').centerMe('#amount', 8);
+    $('#message').centerMe('#message', 0);
+    $('#overlays').centerMe('#overlays', 0);
+    $('#reels').centerMe('#reels', 0);
 }
 
 $( window ).resize(function() {
-	center();
+    center();
 });
 
 var target = $("#winnerName");
@@ -646,7 +317,7 @@ class Spinner {
 class SlotMachine {
 
     constructor(options) {
-        this.fps = options.fps || 30;
+        this.fps = options.fps || 60;
         this.showFPS = options.showFPS || false;
 
         this.slotCount = options.slotCount || 3;
@@ -810,125 +481,123 @@ class SlotMachine {
 
 }
 
-	var tl = new TimelineLite;
-	var slotMachine;
+  var tl = new TimelineLite;
+  var slotMachine;
 
-	var animationController = {
+  var animationController = {
 
         bringIn: function(callback) {
-    		// Bring in all elements
-    		tl.to("#holder", 0, {opacity: 1, delay:.4});
-    		tl.from("#winnerName", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
-    		tl.from("#amount", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.2");
-    		tl.from("#bits", .2, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.3");
-    		tl.staggerFrom(".reel", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
-    		tl.staggerFrom(".overlaySection", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
-    		tl.staggerFrom(".spinner", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
-    		tl.from("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, "-=.2");
+        // Bring in all elements
+        tl.to("#holder", 0, {opacity: 1, delay:.4});
+        tl.from("#winnerName", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
+        tl.from("#amount", .4, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.2");
+        tl.staggerFrom(".reel", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+        tl.staggerFrom(".overlaySection", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+        tl.staggerFrom(".spinner", .3, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .15, "Start");
+        tl.from("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, "-=.2");
     
-    		// Start Roll
-    		tl.to("#holder", 0, {onComplete: callback, delay: 0});
+        // Start Roll
+        tl.to("#holder", 0, {onComplete: callback, delay: 0});
         },
     
         jackpot: function(callback) {
-    		tl.to("#holder", 0, {});
-    		$("#bars").addClass("animated");
-    		$("#amount").addClass("gold");
-    		TweenMax.to("#rays", .6, { opacity: 1});
-    		TweenMax.staggerTo("#winnerName span", .4, { color: "#C5B358", repeat: -1, yoyo:true}, .2);
-    		TweenMax.to("#winnerName", .4, { borderTopColor: "#C5B358", repeat: -1, yoyo:true});
-    		TweenMax.to("#winnerName", .4, { borderBottomColor: "#C5B358", repeat: -1, yoyo:true, delay: .4});
-    		tl.to("#holder", 0, {delay: 4, onComplete: callback});
+        tl.to("#holder", 0, {});
+        $("#bars").addClass("animated");
+        $("#amount").addClass("gold");
+        TweenMax.to("#rays", .6, { opacity: 1});
+        TweenMax.staggerTo("#winnerName span", .4, { color: "#C5B358", repeat: -1, yoyo:true}, .2);
+        TweenMax.to("#winnerName", .4, { borderTopColor: "#C5B358", repeat: -1, yoyo:true});
+        TweenMax.to("#winnerName", .4, { borderBottomColor: "#C5B358", repeat: -1, yoyo:true, delay: .4});
+        tl.to("#holder", 0, {delay: 4, onComplete: callback});
         },
     
         takeOut: function(callback) {
-        	// End game
-    		tl.to("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0, delay: 4});
-    		tl.to("#rays", .6, { opacity: 0});
-    		tl.staggerTo(".spinner", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
-    		tl.staggerTo(".reel", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
-    		tl.staggerTo(".overlaySection", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
-    		tl.to("#winnerName", .2, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
-    		tl.to("#amount", .4, {onComplete: callback, ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.1");
-    		tl.to("#bits", .4, {ease: Back.easeOut.config(2.7), scale:.2, opacity: 0}, "-=.2");
+          // End game
+        tl.to("#message", .4, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0, delay: 4});
+        tl.to("#rays", .6, { opacity: 0});
+        tl.staggerTo(".spinner", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+        tl.staggerTo(".reel", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+        tl.staggerTo(".overlaySection", .2, {ease: Back.easeOut.config(2.7), y: "-=60", opacity: 0}, .1, "End");
+        tl.to("#winnerName", .2, {ease: Back.easeOut.config(2.7), scale:.4, opacity: 0});
+        tl.to("#amount", .4, {onComplete: callback, ease: Back.easeOut.config(2.7), scale:.4, opacity: 0}, "-=.1");
         }
     
     };
 
-	var getIconSheet = function(url, callback) {
-		var iconSheet = new Image();
-		iconSheet.src = url;
-		iconSheet.onload = function() {
-			console.log("thing has been done");
-			return callback(iconSheet);
-		};
-	};
+  var getIconSheet = function(url, callback) {
+    var iconSheet = new Image();
+    iconSheet.src = url;
+    iconSheet.onload = function() {
+      console.log("thing has been done");
+      return callback(iconSheet);
+    };
+  };
 
-	var slotMachineController = {
-		init: function(iconSheet, callback) {
-			slotMachine = new SlotMachine({
-	            fps: 30,
-	            showFPS: userOptions.showFPS,
-	            slotCount: 3,
-	            gameMount: "game",
-	            isRandom: true,
-	            iconSheet: iconSheet,
+  var slotMachineController = {
+    init: function(iconSheet, callback) {
+      slotMachine = new SlotMachine({
+              fps: 60,
+              showFPS: userOptions.showFPS,
+              slotCount: 3,
+              gameMount: "game",
+              isRandom: true,
+              iconSheet: iconSheet,
 
-	            cellSize: userOptions.cellSize,
-	            verticalSpacing: userOptions.verticalSpacing,
-	            spinnerHeight: 260
-	        });
+              cellSize: userOptions.cellSize,
+              verticalSpacing: userOptions.verticalSpacing,
+              spinnerHeight: 260
+          });
 
-			var to = generateResult(slotMachine.iconCount, slotMachine.slotCount);
+      var to = generateResult(slotMachine.iconCount, slotMachine.slotCount);
 
-	        slotMachine.init({
-	            from: [1, 2, 3],
-	            to: to,
-	            spinTime: 3000,
-	            spinTimeAdd: 1000,
-	            spins: 60,
-	            spinsAdd: 15,
-	            showFPS: userOptions.showFPS,
-	            onInitDone: callback
-	        });
-		},
-		spin: function(callback) {
-			slotMachine.spin(callback);
-		}
-	};
+          slotMachine.init({
+              from: [1, 2, 3],
+              to: to,
+              spinTime: 3000,
+              spinTimeAdd: 1000,
+              spins: 60,
+              spinsAdd: 15,
+              showFPS: userOptions.showFPS,
+              onInitDone: callback
+          });
+    },
+    spin: function(callback) {
+      slotMachine.spin(callback);
+    }
+  };
 
-	getIconSheet(userOptions.iconSheetUrl, function(iconSheet) {
-		console.log("icon sheet loaded");
+  getIconSheet(userOptions.iconSheetUrl, function(iconSheet) {
+    console.log("icon sheet loaded");
 
-		slotMachineController.init(iconSheet, function() {
-			console.log("slot machine init'd");
+    slotMachineController.init(iconSheet, function() {
+      console.log("slot machine init'd");
 
-			animationController.bringIn(function() {
-				console.log("animations brought in");
-                audio.volume = userOptions.audioVolume*.01;
+      animationController.bringIn(function() {
+        console.log("animations brought in");
+        audio.volume = userOptions.audioVolume*.01;
                 audio.play();
 
-				slotMachineController.spin(function(win) {
+        slotMachineController.spin(function(win) {
 
 
-					if(win === true) {
-						animationController.jackpot(function() {
-							animationController.takeOut();
-						});
-					} else {
-						animationController.takeOut();
-						if(userOptions.useDefaultSounds=="yes"){
-						    audio.pause();
-						}
-					}
+          if(win === true) {
+            animationController.jackpot(function() {
+              animationController.takeOut();
+            });
+          } else {
+            animationController.takeOut();
+            if(userOptions.useDefaultSounds=="yes"){
+                audio.pause();
+            }
+          }
 
-				});
+        });
 
-			});
+      });
 
-		});
+    });
 
-	});
+  });
 
 };
 
@@ -941,7 +610,311 @@ $.when(
     })
 ).done(function(){
     center();
-    audio = new Audio('assets/slot-machine.mp3');
+    audio = new Audio(userOptions.audioURL);
+    audio.pause();
     animate();
 });
 </script>
+<!--CSS-->
+<style>
+ @import url('https://fonts.googleapis.com/css?family={fontFamily}:100,300,400,500,700,900&display=swap');
+  
+:root {
+  --fontFamily: {fontFamily}, sans-serif;
+  --fontWeight: {fontWeight};
+  --fromSize: {fromSize}px;
+  --typeSize: {typeSize}px;
+  --fontColor: {fontColor};
+  --topBorderC: {topBorderC};
+  --bottomBorderC: {bottomBorderC};
+}
+  
+html{
+  font-family: var(--fontFamily);
+}
+
+#holder {
+  width: 100%;
+  height: 300px;
+  position: absolute;
+  left: 0;
+  top: 350px;
+  opacity: 0;
+}
+
+#reels {
+  height: 260px;
+  position: absolute;
+}
+
+.reel {
+  background: #fff;
+  width: 180px;
+  height: 260px;
+  position: relative;
+  margin-right: 20px;
+  float: left;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0 0px rgba(252,234,187,.8);
+}
+.reel:last-child{
+  margin-right: 0;
+}
+#reels.animated .bar{
+  animation: boxGlow 1s linear infinite;
+}
+#reels.animated .reel.left {
+  animation-delay: 0s;
+}
+#reels.animated .reel.middle {
+  animation-delay: .33s;
+}
+#reels.animated .reel.right {
+  animation-delay: .66s;
+}
+
+#game {
+  width: 580px;
+  height: 260px;
+  position: absolute;
+  left: 50%;
+  margin-left: -290px;
+  z-index: 100;
+}
+
+#overlays {
+  z-index: 999;
+  height: 260px;
+  position: absolute;
+}
+
+.overlaySection {
+  position: relative;
+  width: 180px;
+  height: 260px;
+  float: left;
+  margin-right: 20px;
+}
+.overlaySection:last-child{
+  margin-right: 0;
+}
+
+.outline {
+  width: 181px;
+  height: 262px;
+  background: none;
+  z-index: 99;
+  position: absolute;
+  top: -1px;
+  border: 2px solid #111;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.outlineOutter {
+  width: 183px;
+  height: 264px;
+  background: none;
+  z-index: 90;
+  position: absolute;
+  top: -2px;
+  left: -1px;
+  border: 2px solid #777;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.shadowReel {
+  width: 180px;
+  height: 260px;
+  position: absolute;
+  overflow: hidden;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.shortShadow{
+  z-index: 2;
+  position: absolute;
+  height: 60px;
+  width: 100%;
+}
+.longShadow{
+  z-index: 1;
+  position: absolute;
+  height: 110px;
+  width: 100%;
+}
+
+.shortShadow.top {
+  border-radius: 10px 10px 0 0;
+  top: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
+}
+.longShadow.top {
+  border-radius: 10px 10px 0 0;
+  top: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+.shortShadow.bottom {
+  border-radius: 0 0 10px 10px;
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 100%);
+}
+.longShadow.bottom {
+  border-radius:0 0 10px 10px;
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+#below {
+  position: absolute;
+  width: 100%;
+  height: 260px;
+  left: 0;
+  top: 0;
+}
+
+#above {
+  position: absolute;
+  width: 100%;
+  height: 260px;
+  left: 0;
+  top: 0;
+}
+
+#winnerName {
+  position: absolute;
+  min-width: 300px;
+  top: -120px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 42px;
+  color: var(--fontColor);
+  padding: 20px 20px 10px 20px;
+  border-top: 1px solid var(--bottomBorderC);
+  border-bottom: 1px solid var(--bottomBorderC);
+  background: linear-gradient(to top, rgba(20, 30, 48, .6), rgba(36, 59, 85, .5));
+}
+
+#amount{
+  font-weight: bold;
+  position: absolute;
+  top: -142px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 26px;
+  background: #000;
+  color: #FFF;
+  border-top: 1px solid var(--topBorderC);
+  border-bottom: 1px solid var(--topBorderC);
+}
+  
+#amount.gold {
+  border-top: 1px solid rgb(252,234,187);
+  border-bottom: 1px solid rgb(252,234,187);
+  color: rgb(252,234,187);
+}
+
+#amount span{
+  font-size: 16px;
+  position: relative;
+  top: -6px;
+  left: -4px;
+}
+
+#message {
+  font-size: 20px;
+  text-align: center;
+  width: 500px;
+  position: absolute;
+  top: 280px;
+  color: #FFF;
+  text-shadow:  -3px -1px 3px rgba(0,0,0,.2),
+            0px 4px 3px rgba(0,0,0,.7),
+            0px 8px 10px rgba(0,0,0,0.2);
+}
+
+#winnerName span {
+  position: relative;
+}
+
+#rays {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin-left: -290px;
+  width: 580px;
+  height: 260px;
+  animation: raySpin 60s linear infinite;
+}
+
+.ray {
+  width: 340px;
+  height: 60px;
+  position: absolute;
+  top: 50%;
+  margin-top: -30px;
+  left: 50%;
+  transform-origin: left 50%;
+  background: linear-gradient(to left,  rgba(252,234,187,.2), rgba(252,234,187,1));
+  filter: blur(8px);
+
+}
+.ray:nth-child(2){
+  transform: rotate(30deg)
+}
+.ray:nth-child(3){
+  transform: rotate(60deg)
+}
+.ray:nth-child(4){
+  transform: rotate(90deg)
+}
+.ray:nth-child(5){
+  transform: rotate(120deg)
+}
+.ray:nth-child(6){
+  transform: rotate(150deg)
+}
+.ray:nth-child(7){
+  transform: rotate(180deg)
+}
+.ray:nth-child(8){
+  transform: rotate(210deg)
+}
+.ray:nth-child(9){
+  transform: rotate(240deg)
+}
+.ray:nth-child(10){
+  transform: rotate(270deg)
+}
+.ray:nth-child(11){
+  transform: rotate(300deg)
+}
+.ray:nth-child(12){
+  transform: rotate(330deg)
+}
+
+@keyframes raySpin {
+  from {transform: rotate(-360deg)}
+}
+
+@keyframes boxGlow {
+  0%, 100% {box-shadow: 0 0 0px rgba(255,255,255,.8);}
+  50% {box-shadow: 0 0 50px rgba(252,234,187,.8);}
+}
+
+.spinner {
+  margin-left: 30px;
+  margin-right: 51px;
+}
+.spinner:nth-child(2){
+  margin-right: 50px;
+}
+.spinner:last-child {
+  margin-right: 0;
+}
+</style>
